@@ -85,26 +85,49 @@ def detect_header_row(raw_df, max_rows=30):
     return int(best_index)
 
 
+def _column_letter(index):
+    letters = ""
+    number = index + 1
+    while number:
+        number, remainder = divmod(number - 1, 26)
+        letters = chr(65 + remainder) + letters
+    return letters
+
+
+def _normalize_columns(columns):
+    normalized = []
+    unnamed_count = 0
+    duplicate_count = 0
+    seen = {}
+    for idx, column in enumerate(columns):
+        label = str(column).strip()
+        if not label or label.lower() == "nan":
+            label = f"Coluna {_column_letter(idx)}"
+            unnamed_count += 1
+
+        total_seen = seen.get(label, 0)
+        seen[label] = total_seen + 1
+        if total_seen:
+            duplicate_count += 1
+            label = f"{label} ({total_seen + 1})"
+        normalized.append(label)
+
+    return normalized, {"unnamed_columns": unnamed_count, "duplicate_columns": duplicate_count}
+
+
 def _clean_dataframe(df):
     df = df.dropna(how="all")
-    df.columns = [str(col).strip() if str(col).strip() else f"Coluna {idx + 1}" for idx, col in enumerate(df.columns)]
-    df = df.loc[:, ~pd.Index(df.columns).duplicated()]
-    return df.fillna("")
+    columns, analysis = _normalize_columns(df.columns)
+    df.columns = columns
+    return df.fillna(""), analysis
 
 
-def _build_preview(df, header_line_number, data_line_offset):
-    preview = [
-        {
-            "__line_number": header_line_number,
-            "__is_header": True,
-            **{column: column for column in df.columns},
-        }
-    ]
+def _build_preview(df, data_line_offset):
+    preview = []
     for idx, row in df.head(20).iterrows():
         preview.append(
             {
                 "__line_number": int(idx) + data_line_offset,
-                "__is_header": False,
                 **row.to_dict(),
             }
         )
@@ -129,15 +152,27 @@ def read_table(path, sheet_name=None, header_row=None):
     columns = raw.iloc[header_index].fillna("").astype(str).tolist()
     df = raw.iloc[header_index + 1 :].copy()
     df.columns = columns
-    df = _clean_dataframe(df)
+    df, analysis = _clean_dataframe(df)
     header_line_number = header_index + 1
     data_line_offset = 1
 
-    detected = detect_columns(df.columns)
-    preview = _build_preview(df, header_line_number, data_line_offset)
+    detected = detect_columns(df.columns, df)
+    warnings = []
+    if analysis["unnamed_columns"]:
+        warnings.append(f"{analysis['unnamed_columns']} coluna(s) sem nome receberam rótulos temporários.")
+    if analysis["duplicate_columns"]:
+        warnings.append(f"{analysis['duplicate_columns']} cabeçalho(s) repetido(s) foram numerados para preservar os dados.")
+    if not detected["cpf"]:
+        warnings.append("Não foi possível identificar a coluna de CPF automaticamente.")
+    if not detected["valor"]:
+        warnings.append("Não foi possível identificar a coluna de valor automaticamente.")
+    analysis["warnings"] = warnings
+
+    preview = _build_preview(df, data_line_offset)
     return {
         "columns": list(df.columns),
         "detected": detected,
+        "analysis": analysis,
         "preview": preview,
         "rows": len(df),
         "dataframe": df,

@@ -20,7 +20,7 @@ def normalize_records(df, mapping, source):
         original_name = str(row.get(nome_col, "")).strip() if nome_col else ""
         item = {
             "source": source,
-            "row_number": int(index) + 2,
+            "row_number": int(index) + 1,
             "cpf": cpf,
             "cpf_formatado": format_cpf(cpf),
             "cpf_valido": bool(cpf and is_valid_cpf(cpf)),

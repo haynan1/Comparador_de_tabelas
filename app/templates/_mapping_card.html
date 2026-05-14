@@ -1,13 +1,37 @@
 <section class="panel">
-  <h2>{{ title }}</h2>
-  <p class="muted">{{ dataset.rows }} linhas de dados. Cabeçalho na linha {{ dataset.header_row }}.</p>
+  <div class="mapping-card-header">
+    <div>
+      <h2>{{ title }}</h2>
+      <p class="muted">{{ dataset.rows }} linhas de dados. Cabeçalho detectado na linha {{ dataset.header_row }}.</p>
+    </div>
+    <div class="structure-badges" aria-label="Resumo da estrutura da planilha">
+      <span>{{ dataset.columns|length }} colunas</span>
+      {% if dataset.analysis.unnamed_columns %}
+        <span>{{ dataset.analysis.unnamed_columns }} sem nome</span>
+      {% endif %}
+      {% if dataset.analysis.duplicate_columns %}
+        <span>{{ dataset.analysis.duplicate_columns }} repetidas</span>
+      {% endif %}
+    </div>
+  </div>
+  {% if dataset.analysis.warnings %}
+    <div class="structure-alert">
+      {% for warning in dataset.analysis.warnings %}
+        <span>{{ warning }}</span>
+      {% endfor %}
+    </div>
+  {% endif %}
   <div class="mapping">
     <label>CPF
       <select name="{{ prefix }}_cpf" required>
+        <option value="" disabled {% if not dataset.detected.cpf %}selected{% endif %}>Escolha a coluna de CPF</option>
         {% for col in dataset.columns %}
           <option value="{{ col }}" {% if col == dataset.detected.cpf %}selected{% endif %}>{{ col }}</option>
         {% endfor %}
       </select>
+      {% if dataset.detected.cpf %}
+        <span class="field-hint">Sugerido: {{ dataset.detected.cpf }}</span>
+      {% endif %}
     </label>
     <label>Nome
       <select name="{{ prefix }}_nome">
@@ -16,14 +40,24 @@
           <option value="{{ col }}" {% if col == dataset.detected.nome %}selected{% endif %}>{{ col }}</option>
         {% endfor %}
       </select>
+      {% if dataset.detected.nome %}
+        <span class="field-hint">Sugerido: {{ dataset.detected.nome }}</span>
+      {% endif %}
     </label>
     <label>Valor
       <select name="{{ prefix }}_valor" required>
+        <option value="" disabled {% if not dataset.detected.valor %}selected{% endif %}>Escolha a coluna de valor</option>
         {% for col in dataset.columns %}
           <option value="{{ col }}" {% if col == dataset.detected.valor %}selected{% endif %}>{{ col }}</option>
         {% endfor %}
       </select>
+      {% if dataset.detected.valor %}
+        <span class="field-hint">Sugerido: {{ dataset.detected.valor }}</span>
+      {% endif %}
     </label>
+  </div>
+  <div class="preview-note">
+    Prévia dos dados. A linha {{ dataset.header_row }} foi usada apenas para nomear as colunas.
   </div>
   <div class="table-wrap small">
     <table>
@@ -37,12 +71,9 @@
       </thead>
       <tbody>
         {% for row in dataset.preview %}
-          <tr class="{% if row['__is_header'] %}preview-header-row{% endif %}">
+          <tr>
             <td class="row-number">
               {{ row['__line_number'] }}
-              {% if row['__is_header'] %}
-                <span>Cabeçalho</span>
-              {% endif %}
             </td>
             {% for col in dataset.columns %}
               <td>{{ row[col] }}</td>

@@ -347,12 +347,73 @@ body.linktree-page .page {
 .panel h1, .panel h2 { overflow-wrap: anywhere; }
 .narrow { max-width: 720px; margin-left: auto; margin-right: auto; }
 .grid.two { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; align-items: start; }
+.mapping-cards {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 520px), 1fr));
+}
 .form-grid, .mapping, .filters { display: grid; gap: 14px; }
 .mapping { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 .filters { grid-template-columns: repeat(5, minmax(140px, 1fr)); align-items: end; }
+.mapping-card-header {
+  display: grid;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+.mapping-card-header > div:first-child {
+  min-width: 0;
+}
+.mapping-card-header h2 {
+  font-size: 19px;
+  line-height: 1.25;
+}
+.structure-badges {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+  gap: 6px;
+}
+.structure-badges span {
+  padding: 4px 8px;
+  color: var(--badge-text);
+  font-size: 12px;
+  font-weight: 800;
+  background: var(--badge-bg);
+  border-radius: 999px;
+}
+.structure-alert {
+  display: grid;
+  gap: 6px;
+  margin: 0 0 14px;
+  padding: 10px 12px;
+  color: var(--text);
+  background: color-mix(in srgb, var(--primary) 8%, var(--surface-soft));
+  border: 1px solid color-mix(in srgb, var(--primary) 28%, var(--line));
+  border-radius: 6px;
+  font-size: 13px;
+  line-height: 1.35;
+}
+.field-hint {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.25;
+}
+.preview-note {
+  margin: 12px 0 8px;
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 600;
+}
+.mapping-cards .mapping {
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+  gap: 12px;
+}
+.mapping-cards label {
+  align-content: start;
+}
 label { display: grid; gap: 6px; font-weight: 600; min-width: 0; }
 .inline-label { max-width: 260px; margin-bottom: 14px; }
 input, select {
+  min-width: 0;
   width: 100%;
   border: 1px solid var(--line);
   border-radius: 6px;
@@ -436,21 +497,13 @@ th { background: var(--table-head); position: sticky; top: 0; z-index: 1; }
   position: sticky;
   left: 0;
   z-index: 2;
-  width: 92px;
-  min-width: 92px;
-  max-width: 92px;
+  width: 76px;
+  min-width: 76px;
+  max-width: 76px;
   text-align: center;
   color: var(--muted);
   background: var(--surface-soft);
   box-shadow: 1px 0 0 var(--line);
-}
-.row-number span {
-  display: block;
-  margin-top: 2px;
-  color: var(--primary);
-  font-size: 10px;
-  font-weight: 800;
-  text-transform: uppercase;
 }
 th.row-number {
   z-index: 3;
@@ -680,6 +733,8 @@ tbody tr:hover { background: var(--hover); }
 @media (max-width: 900px) {
   .hero, .section-title { align-items: stretch; flex-direction: column; }
   .grid.two, .mapping, .filters, .cards, .instructions-grid, .example-section { grid-template-columns: 1fr; }
+  .mapping-card-header { display: grid; }
+  .structure-badges { justify-content: flex-start; max-width: none; }
   .history-card-head, .history-files, .history-totals { grid-template-columns: 1fr; }
   .history-card-head { display: grid; }
   .instruction-box { min-height: 0; }
