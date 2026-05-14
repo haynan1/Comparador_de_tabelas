@@ -1,0 +1,55 @@
+<section class="panel">
+  <h2>{{ title }}</h2>
+  <p class="muted">{{ dataset.rows }} linhas de dados. Cabeçalho na linha {{ dataset.header_row }}.</p>
+  <div class="mapping">
+    <label>CPF
+      <select name="{{ prefix }}_cpf" required>
+        {% for col in dataset.columns %}
+          <option value="{{ col }}" {% if col == dataset.detected.cpf %}selected{% endif %}>{{ col }}</option>
+        {% endfor %}
+      </select>
+    </label>
+    <label>Nome
+      <select name="{{ prefix }}_nome">
+        <option value="">Sem coluna de nome</option>
+        {% for col in dataset.columns %}
+          <option value="{{ col }}" {% if col == dataset.detected.nome %}selected{% endif %}>{{ col }}</option>
+        {% endfor %}
+      </select>
+    </label>
+    <label>Valor
+      <select name="{{ prefix }}_valor" required>
+        {% for col in dataset.columns %}
+          <option value="{{ col }}" {% if col == dataset.detected.valor %}selected{% endif %}>{{ col }}</option>
+        {% endfor %}
+      </select>
+    </label>
+  </div>
+  <div class="table-wrap small">
+    <table>
+      <thead>
+        <tr>
+          <th class="row-number">Linha</th>
+          {% for col in dataset.columns %}
+            <th>{{ col }}</th>
+          {% endfor %}
+        </tr>
+      </thead>
+      <tbody>
+        {% for row in dataset.preview %}
+          <tr class="{% if row['__is_header'] %}preview-header-row{% endif %}">
+            <td class="row-number">
+              {{ row['__line_number'] }}
+              {% if row['__is_header'] %}
+                <span>Cabeçalho</span>
+              {% endif %}
+            </td>
+            {% for col in dataset.columns %}
+              <td>{{ row[col] }}</td>
+            {% endfor %}
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</section>

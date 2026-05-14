@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+{% block content %}
+<nav class="back-nav" aria-label="Navegação de retorno">
+  <a class="back-link" href="{{ url_for('main.dashboard') }}">‹ Voltar para Recursos Humanos</a>
+</nav>
+
+<section class="hero">
+  <div>
+    <h1>Comparação local de descontos IPASGO</h1>
+    <p>Importe os relatórios da Prefeitura e do IPASGO, confira o mapeamento de colunas e gere relatórios em Excel e PDF.</p>
+  </div>
+  <a class="button primary" href="{{ url_for('import.nova') }}">Nova Comparação</a>
+</section>
+
+<section class="panel">
+  <div class="section-title history-title">
+    <div>
+      <h2>Histórico</h2>
+      <p class="muted">Cada item abaixo mostra uma comparação já executada. Clique em um cartão para abrir os detalhes e baixar os relatórios.</p>
+    </div>
+    {% if comparisons %}
+      <form method="post" action="{{ url_for('main.limpar_historico') }}" onsubmit="return confirm('Limpar todo o histórico de comparações? Esta ação também remove os relatórios Excel e PDF gerados.');">
+        <button class="button danger" type="submit">Limpar histórico</button>
+      </form>
+    {% endif %}
+  </div>
+
+  {% if comparisons %}
+    <div class="history-list">
+      {% for item in comparisons %}
+        <a class="history-card" href="{{ url_for('comparison.detalhe', comparison_id=item['id']) }}">
+          <div class="history-card-head">
+            <div>
+              <span class="history-kicker">Comparação #{{ item["id"] }}</span>
+              <strong>{{ item["created_at"] }}</strong>
+            </div>
+            <span class="badge ok">{{ item["status"] }}</span>
+          </div>
+
+          <div class="history-files" aria-label="Arquivos comparados">
+            <div class="history-file">
+              <span>Arquivo da Prefeitura</span>
+              <strong title="{{ item["prefeitura_filename"] }}">{{ item["prefeitura_filename"] }}</strong>
+            </div>
+            <div class="history-file">
+              <span>Arquivo do IPASGO</span>
+              <strong title="{{ item["ipasgo_filename"] }}">{{ item["ipasgo_filename"] }}</strong>
+            </div>
+          </div>
+
+          <div class="history-totals" aria-label="Resumo financeiro">
+            <div>
+              <span>Soma Prefeitura</span>
+              <strong>R$ {{ item["soma_prefeitura"].replace('.', ',') }}</strong>
+            </div>
+            <div>
+              <span>Soma IPASGO</span>
+              <strong>R$ {{ item["soma_ipasgo"].replace('.', ',') }}</strong>
+            </div>
+            <div>
+              <span>Diferença encontrada</span>
+              <strong>R$ {{ item["diferenca_total"].replace('.', ',') }}</strong>
+            </div>
+          </div>
+
+          <span class="history-action">Ver detalhes da comparação</span>
+        </a>
+      {% endfor %}
+    </div>
+  {% else %}
+    <div class="empty-state">
+      <h3>Nenhuma comparação registrada ainda</h3>
+      <p class="muted">Quando você comparar os arquivos da Prefeitura e do IPASGO, o resultado aparecerá aqui com data, totais e acesso aos relatórios.</p>
+      <a class="button primary" href="{{ url_for('import.nova') }}">Fazer primeira comparação</a>
+    </div>
+  {% endif %}
+</section>
+{% endblock %}

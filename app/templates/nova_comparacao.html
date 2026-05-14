@@ -1,0 +1,86 @@
+{% extends "base.html" %}
+{% block content %}
+<nav class="back-nav" aria-label="Navegação de retorno">
+  <a class="back-link" href="{{ url_for('main.comparador') }}">‹ Voltar para o histórico</a>
+</nav>
+
+<section class="panel guide-panel">
+  <div class="guide-header">
+    <h1>Como devem ser as tabelas</h1>
+    <p class="muted">Cada arquivo precisa ter uma linha por pessoa e, no mínimo, três informações: CPF, nome e valor.</p>
+  </div>
+
+  <div class="instructions-grid">
+    <article class="instruction-box">
+      <h2>Colunas necessárias</h2>
+      <ul>
+        <li><strong>CPF:</strong> pode vir como CPF, C.P.F., documento, cpf servidor ou matrícula cpf.</li>
+        <li><strong>Nome:</strong> pode vir como nome, servidor, funcionário, beneficiário ou nome servidor.</li>
+        <li><strong>Valor:</strong> pode vir como valor, desconto, contribuição, total ou valor IPASGO.</li>
+      </ul>
+    </article>
+
+    <article class="instruction-box">
+      <h2>Formatos aceitos</h2>
+      <ul>
+        <li>CPF com ou sem máscara: 529.982.247-25 ou 52998224725.</li>
+        <li>Valores como 194,46, 1.042,88, R$ 1.042,88 ou 1042.88.</li>
+        <li>Arquivos CSV, XLSX ou XLS.</li>
+      </ul>
+    </article>
+  </div>
+
+  <div class="example-section">
+    <div>
+      <h2>Exemplo de estrutura</h2>
+      <p class="muted">A ordem das colunas pode variar. Você confirmará o mapeamento na próxima etapa.</p>
+    </div>
+
+    <div class="example-table">
+      <table>
+        <thead>
+          <tr>
+            <th>CPF</th>
+            <th>Nome</th>
+            <th>Valor</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>529.982.247-25</td>
+            <td>MARIA JOSE DA SILVA</td>
+            <td>194,46</td>
+          </tr>
+          <tr>
+            <td>12345678909</td>
+            <td>JOAO PEREIRA</td>
+            <td>1.042,88</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <p class="guide-note">Se o relatório tiver títulos antes da tabela, totais no final ou colunas extras, você poderá ajustar a aba, a linha do cabeçalho e o mapeamento na próxima tela.</p>
+</section>
+
+<section class="panel narrow">
+  <h1>Nova Comparação</h1>
+  <p class="muted">Envie os dois relatórios. Os arquivos originais serão copiados para a pasta local de uploads.</p>
+  <form method="post" action="{{ url_for('import.previsualizar') }}" enctype="multipart/form-data" class="form-grid">
+    <label class="file-card" for="prefeituraFile">
+      <span class="file-title">Arquivo da Prefeitura</span>
+      <span class="file-help">Clique para escolher um CSV, XLSX ou XLS</span>
+      <span class="file-name" data-file-name="prefeituraFile">Nenhum arquivo selecionado</span>
+      <input id="prefeituraFile" type="file" name="prefeitura_file" accept=".csv,.xlsx,.xls" required>
+    </label>
+    <label class="file-card" for="ipasgoFile">
+      <span class="file-title">Arquivo oficial do IPASGO</span>
+      <span class="file-help">Clique para escolher o relatório oficial</span>
+      <span class="file-name" data-file-name="ipasgoFile">Nenhum arquivo selecionado</span>
+      <input id="ipasgoFile" type="file" name="ipasgo_file" accept=".csv,.xlsx,.xls" required>
+    </label>
+    <button class="button primary" type="submit">Pré-visualizar e mapear</button>
+  </form>
+</section>
+{% endblock %}

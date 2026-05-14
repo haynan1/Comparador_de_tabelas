@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+{% block content %}
+<nav class="back-nav" aria-label="Navegação de retorno">
+  <a class="back-link" href="{{ url_for('main.comparador') }}">‹ Voltar para o histórico</a>
+</nav>
+
+<section class="hero compact">
+  <div>
+    <h1>Comparação #{{ comparison["id"] }}</h1>
+    <p>{{ comparison["created_at"] }} · {{ comparison["prefeitura_filename"] }} × {{ comparison["ipasgo_filename"] }}</p>
+  </div>
+  <div class="actions">
+    <a class="button primary" href="{{ url_for('reports.download', comparison_id=comparison['id'], kind='excel') }}">Baixar Excel</a>
+    <a class="button" href="{{ url_for('reports.download', comparison_id=comparison['id'], kind='pdf') }}">Baixar PDF</a>
+  </div>
+</section>
+
+<section class="cards">
+  <article><strong>{{ comparison["total_prefeitura"] }}</strong><span>Registros Prefeitura</span></article>
+  <article><strong>{{ comparison["total_ipasgo"] }}</strong><span>Registros IPASGO</span></article>
+  <article><strong>{{ counts["OK"] }}</strong><span>OK</span></article>
+  <article><strong>{{ counts["Divergente"] }}</strong><span>Divergentes</span></article>
+  <article><strong>{{ counts["Só na Prefeitura"] + counts["Só no IPASGO"] }}</strong><span>Não encontrados</span></article>
+  <article><strong>{{ counts["Dados inválidos"] }}</strong><span>Inválidos</span></article>
+</section>
+
+<section class="panel">
+  <div class="section-title">
+    <div>
+      <h2>Onde estão as diferenças</h2>
+      <p class="muted">A coluna Servidor mostra a pessoa relacionada a cada divergência, duplicidade, ausência ou registro inválido.</p>
+    </div>
+    <input id="tableFilter" type="search" placeholder="Filtrar por CPF, servidor ou status">
+  </div>
+  <div class="table-wrap">
+    <table id="resultTable">
+      <thead>
+        <tr>
+          <th>CPF</th>
+          <th>Servidor</th>
+          <th>Nome Prefeitura</th>
+          <th>Nome IPASGO</th>
+          <th>Valor Prefeitura</th>
+          <th>Valor IPASGO</th>
+          <th>Diferença</th>
+          <th>Status</th>
+          <th>Observação</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for row in rows %}
+          {% set servidor = row["nome_prefeitura"] or row["nome_ipasgo"] %}
+          <tr>
+            <td>{{ row["cpf"] }}</td>
+            <td><strong>{{ servidor }}</strong></td>
+            <td>{{ row["nome_prefeitura"] }}</td>
+            <td>{{ row["nome_ipasgo"] }}</td>
+            <td>{% if row["valor_prefeitura"] %}R$ {{ row["valor_prefeitura"].replace('.', ',') }}{% endif %}</td>
+            <td>{% if row["valor_ipasgo"] %}R$ {{ row["valor_ipasgo"].replace('.', ',') }}{% endif %}</td>
+            <td>{% if row["diferenca"] %}R$ {{ row["diferenca"].replace('.', ',') }}{% endif %}</td>
+            <td><span class="badge">{{ row["status"] }}</span></td>
+            <td>{{ row["observacao"] }}</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</section>
+{% endblock %}

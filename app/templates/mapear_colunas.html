@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+{% block content %}
+<nav class="back-nav" aria-label="Navegação de retorno">
+  <a class="back-link" href="{{ url_for('import.nova') }}">‹ Voltar para envio dos arquivos</a>
+</nav>
+
+<section class="panel">
+  <h1>Pré-visualização e mapeamento</h1>
+  <p class="muted">Confirme as abas, a linha de cabeçalho e as colunas de CPF, nome e valor. Use a numeração exibida na prévia.</p>
+
+  <form method="post" action="{{ url_for('import.previsualizar') }}" class="filters">
+    <input type="hidden" name="prefeitura_path" value="{{ prefeitura_path }}">
+    <input type="hidden" name="ipasgo_path" value="{{ ipasgo_path }}">
+    <label> Aba Prefeitura
+      <select name="prefeitura_sheet">
+        <option value="">Automática / CSV</option>
+        {% for sheet in prefeitura_sheets %}
+          <option value="{{ sheet }}" {% if sheet == selected_pref_sheet %}selected{% endif %}>{{ sheet }}</option>
+        {% endfor %}
+      </select>
+    </label>
+    <label> Linha do cabeçalho Prefeitura
+      <input type="number" name="prefeitura_header_row" min="1" value="{{ prefeitura_header_row }}" placeholder="auto">
+    </label>
+    <label> Aba IPASGO
+      <select name="ipasgo_sheet">
+        <option value="">Automática / CSV</option>
+        {% for sheet in ipasgo_sheets %}
+          <option value="{{ sheet }}" {% if sheet == selected_ipa_sheet %}selected{% endif %}>{{ sheet }}</option>
+        {% endfor %}
+      </select>
+    </label>
+    <label> Linha do cabeçalho IPASGO
+      <input type="number" name="ipasgo_header_row" min="1" value="{{ ipasgo_header_row }}" placeholder="auto">
+    </label>
+    <button class="button" type="submit">Atualizar prévia</button>
+  </form>
+</section>
+
+<form method="post" action="{{ url_for('comparison.executar') }}">
+  <input type="hidden" name="prefeitura_path" value="{{ prefeitura_path }}">
+  <input type="hidden" name="ipasgo_path" value="{{ ipasgo_path }}">
+  <input type="hidden" name="prefeitura_sheet" value="{{ selected_pref_sheet }}">
+  <input type="hidden" name="ipasgo_sheet" value="{{ selected_ipa_sheet }}">
+  <input type="hidden" name="prefeitura_header_row" value="{{ prefeitura_header_row }}">
+  <input type="hidden" name="ipasgo_header_row" value="{{ ipasgo_header_row }}">
+
+  <div class="grid two">
+    {% set dataset = prefeitura %}
+    {% set prefix = "prefeitura" %}
+    {% set title = "Prefeitura: " ~ prefeitura_filename %}
+    {% include "_mapping_card.html" %}
+
+    {% set dataset = ipasgo %}
+    {% set prefix = "ipasgo" %}
+    {% set title = "IPASGO: " ~ ipasgo_filename %}
+    {% include "_mapping_card.html" %}
+  </div>
+
+  <section class="panel">
+    <label class="inline-label">Tolerância financeira
+      <input type="text" name="tolerancia" value="0,00">
+    </label>
+    <button class="button primary" type="submit">Executar comparação</button>
+  </section>
+</form>
+{% endblock %}

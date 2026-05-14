@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block body_class %}linktree-page{% endblock %}
+{% block content %}
+<main class="link-hub-shell">
+  <section class="link-hub-profile" aria-labelledby="link-hub-title">
+    <img class="link-hub-avatar" src="{{ url_for('static', filename='img/imagem.png') }}" alt="Perfil de Recursos Humanos">
+    <p class="link-hub-eyebrow">Link Hub</p>
+    <h1 id="link-hub-title">Recursos Humanos</h1>
+    <p class="link-hub-subtitle">IPASGO | Relatórios | Validações | Ferramentas administrativas</p>
+  </section>
+
+  <nav class="link-hub-list" aria-label="Links principais">
+    {% for utility in utilities %}
+      {% if utility.href == "#" %}
+        <article class="link-hub-button disabled" aria-disabled="true">
+          <span class="link-hub-icon" aria-hidden="true">{{ utility.icon }}</span>
+          <span class="link-hub-content">
+            <span class="link-hub-title-row">
+              <span class="link-hub-title">{{ utility.title }}</span>
+              <span class="link-hub-status">{{ utility.status }}</span>
+            </span>
+            <span class="link-hub-description">{{ utility.description }}</span>
+          </span>
+          <span class="link-hub-arrow" aria-hidden="true">&rsaquo;</span>
+        </article>
+      {% else %}
+        <a class="link-hub-button" href="{{ utility.href }}">
+          <span class="link-hub-icon" aria-hidden="true">{{ utility.icon }}</span>
+          <span class="link-hub-content">
+            <span class="link-hub-title-row">
+              <span class="link-hub-title">{{ utility.title }}</span>
+              <span class="link-hub-status">{{ utility.status }}</span>
+            </span>
+            <span class="link-hub-description">{{ utility.description }}</span>
+          </span>
+          <span class="link-hub-arrow" aria-hidden="true">&rsaquo;</span>
+        </a>
+      {% endif %}
+    {% endfor %}
+  </nav>
+</main>
+{% endblock %}
