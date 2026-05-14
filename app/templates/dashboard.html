@@ -20,6 +20,7 @@
     </div>
     {% if comparisons %}
       <form method="post" action="{{ url_for('main.limpar_historico') }}" onsubmit="return confirm('Limpar todo o histórico de comparações? Esta ação também remove os relatórios Excel e PDF gerados.');">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
         <button class="button danger" type="submit">Limpar histórico</button>
       </form>
     {% endif %}

@@ -54,6 +54,26 @@ def create_comparison(db_path, summary, rows):
         return comparison_id
 
 
+def delete_comparison(db_path, comparison_id):
+    with get_connection(db_path) as conn:
+        row = conn.execute(
+            "SELECT excel_report_path, pdf_report_path FROM comparisons WHERE id = ?",
+            (comparison_id,),
+        ).fetchone()
+        if not row:
+            return
+        conn.execute("DELETE FROM comparison_rows WHERE comparison_id = ?", (comparison_id,))
+        conn.execute("DELETE FROM comparisons WHERE id = ?", (comparison_id,))
+        conn.commit()
+    for key in ("excel_report_path", "pdf_report_path"):
+        path = row[key]
+        if path:
+            try:
+                Path(path).unlink(missing_ok=True)
+            except OSError:
+                pass
+
+
 def update_report_paths(db_path, comparison_id, excel_path, pdf_path):
     with get_connection(db_path) as conn:
         conn.execute(
@@ -65,7 +85,6 @@ def update_report_paths(db_path, comparison_id, excel_path, pdf_path):
 
 
 def list_comparisons(db_path, limit=100):
-    cleanup_old_comparisons(db_path)
     with get_connection(db_path) as conn:
         rows = conn.execute(
             "SELECT * FROM comparisons ORDER BY id DESC LIMIT ?",

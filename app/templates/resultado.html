@@ -48,6 +48,13 @@
         </tr>
       </thead>
       <tbody>
+        {% set status_map = {
+          'OK': 'status-ok',
+          'Divergente': 'status-divergente',
+          'Só na Prefeitura': 'status-so-pref',
+          'Só no IPASGO': 'status-so-ipasgo',
+          'Dados inválidos': 'status-invalido'
+        } %}
         {% for row in rows %}
           {% set servidor = row["nome_prefeitura"] or row["nome_ipasgo"] %}
           <tr>
@@ -58,7 +65,9 @@
             <td>{% if row["valor_prefeitura"] %}R$ {{ row["valor_prefeitura"].replace('.', ',') }}{% endif %}</td>
             <td>{% if row["valor_ipasgo"] %}R$ {{ row["valor_ipasgo"].replace('.', ',') }}{% endif %}</td>
             <td>{% if row["diferenca"] %}R$ {{ row["diferenca"].replace('.', ',') }}{% endif %}</td>
-            <td><span class="badge">{{ row["status"] }}</span></td>
+            <td>
+              <span class="badge {{ status_map.get(row['status'], 'status-duplicado') }}">{{ row["status"] }}</span>
+            </td>
             <td>{{ row["observacao"] }}</td>
           </tr>
         {% endfor %}

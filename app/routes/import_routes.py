@@ -1,3 +1,4 @@
+import logging
 import shutil
 from pathlib import Path
 
@@ -7,7 +8,26 @@ from app.services.file_reader import SUPPORTED_EXTENSIONS, get_excel_sheets, rea
 from app.services.filename_utils import display_filename, make_upload_filename
 
 
+logger = logging.getLogger(__name__)
+
 import_bp = Blueprint("import", __name__, url_prefix="/comparacoes")
+
+_XLSX_MAGIC = b"\x50\x4B\x03\x04"
+_XLS_MAGIC = b"\xD0\xCF\x11\xE0"
+
+
+def _validate_mime(path: Path, ext: str) -> bool:
+    if ext == ".csv":
+        return True
+    try:
+        header = path.read_bytes()[:4]
+    except OSError:
+        return False
+    if ext == ".xlsx":
+        return header == _XLSX_MAGIC
+    if ext == ".xls":
+        return header == _XLS_MAGIC
+    return False
 
 
 @import_bp.route("/nova", methods=["GET"])
@@ -46,16 +66,18 @@ def previsualizar():
             prefeitura_header_row=pref_header or pref["header_row"],
             ipasgo_header_row=ipa_header or ipa["header_row"],
         )
-    except Exception as exc:
-        flash(f"Erro ao ler os arquivos: {exc}", "error")
+    except Exception:
+        logger.exception("Erro ao ler arquivos para pré-visualização")
+        flash("Erro ao processar os arquivos. Verifique o formato e tente novamente.", "error")
         return redirect(url_for("import.nova"))
 
 
 def _get_or_save_file(field_name, existing_path):
     if existing_path:
-        path = Path(existing_path)
-        if path.exists():
-            return path
+        upload_dir = current_app.config["UPLOAD_DIR"].resolve()
+        resolved = Path(existing_path).resolve()
+        if resolved.is_relative_to(upload_dir) and resolved.exists():
+            return resolved
     file = request.files.get(field_name)
     if not file or not file.filename:
         return None
@@ -66,4 +88,7 @@ def _get_or_save_file(field_name, existing_path):
     target = current_app.config["UPLOAD_DIR"] / filename
     with target.open("wb") as output:
         shutil.copyfileobj(file.stream, output)
+    if not _validate_mime(target, ext):
+        target.unlink(missing_ok=True)
+        raise ValueError(f"Conteúdo de {file.filename} não corresponde à extensão informada.")
     return target

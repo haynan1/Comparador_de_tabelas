@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="panel narrow login-panel">
+  <h1>Acesso</h1>
+  <p class="muted">Recursos Humanos — área restrita</p>
+  <form method="post" action="{{ url_for('auth.login') }}" class="form-grid">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    {% if next %}
+      <input type="hidden" name="next" value="{{ next }}">
+    {% endif %}
+    <label>Senha
+      <input type="password" name="password" autofocus autocomplete="current-password" required>
+    </label>
+    <button class="button primary" type="submit">Entrar</button>
+  </form>
+</section>
+{% endblock %}

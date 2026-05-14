@@ -9,6 +9,7 @@
   <p class="muted">Confirme as abas, a linha de cabeçalho e as colunas de CPF, nome e valor. Use a numeração exibida na prévia.</p>
 
   <form method="post" action="{{ url_for('import.previsualizar') }}" class="filters">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
     <input type="hidden" name="prefeitura_path" value="{{ prefeitura_path }}">
     <input type="hidden" name="ipasgo_path" value="{{ ipasgo_path }}">
     <label> Aba Prefeitura
@@ -38,6 +39,7 @@
 </section>
 
 <form method="post" action="{{ url_for('comparison.executar') }}">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
   <input type="hidden" name="prefeitura_path" value="{{ prefeitura_path }}">
   <input type="hidden" name="ipasgo_path" value="{{ ipasgo_path }}">
   <input type="hidden" name="prefeitura_sheet" value="{{ selected_pref_sheet }}">

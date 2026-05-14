@@ -68,6 +68,7 @@
   <h1>Nova Comparação</h1>
   <p class="muted">Envie os dois relatórios. Os arquivos originais serão copiados para a pasta local de uploads.</p>
   <form method="post" action="{{ url_for('import.previsualizar') }}" enctype="multipart/form-data" class="form-grid">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
     <label class="file-card" for="prefeituraFile">
       <span class="file-title">Arquivo da Prefeitura</span>
       <span class="file-help">Clique para escolher um CSV, XLSX ou XLS</span>

@@ -46,7 +46,7 @@
     </label>
     <label>Valor
       <select name="{{ prefix }}_valor" required>
-        <option value="" disabled {% if not dataset.detected.valor %}selected{% endif %}>Escolha a coluna de valor</option>
+        <option value="" disabled {% if not dataset.detected.valor %}selected{% endif %}>Escolha</option>
         {% for col in dataset.columns %}
           <option value="{{ col }}" {% if col == dataset.detected.valor %}selected{% endif %}>{{ col }}</option>
         {% endfor %}

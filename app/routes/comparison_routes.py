@@ -1,3 +1,4 @@
+import logging
 from collections import Counter
 from datetime import datetime
 from decimal import Decimal
@@ -5,7 +6,12 @@ from pathlib import Path
 
 from flask import Blueprint, current_app, flash, redirect, render_template, request, url_for
 
-from app.models.comparison_model import create_comparison, get_comparison, update_report_paths
+from app.models.comparison_model import (
+    create_comparison,
+    delete_comparison,
+    get_comparison,
+    update_report_paths,
+)
 from app.services.comparator import compare_data, normalize_records, validation_summary
 from app.services.excel_report import generate_excel_report
 from app.services.file_reader import read_table
@@ -14,14 +20,23 @@ from app.services.normalizer import decimal_to_str
 from app.services.pdf_report import generate_pdf_report
 
 
+logger = logging.getLogger(__name__)
+
 comparison_bp = Blueprint("comparison", __name__, url_prefix="/comparacoes")
 
 
 @comparison_bp.route("/executar", methods=["POST"])
 def executar():
+    comparison_id = None
     try:
-        prefeitura_path = Path(request.form["prefeitura_path"])
-        ipasgo_path = Path(request.form["ipasgo_path"])
+        upload_dir = current_app.config["UPLOAD_DIR"].resolve()
+        prefeitura_path = Path(request.form["prefeitura_path"]).resolve()
+        ipasgo_path = Path(request.form["ipasgo_path"]).resolve()
+
+        if not prefeitura_path.is_relative_to(upload_dir) or not ipasgo_path.is_relative_to(upload_dir):
+            flash("Caminho de arquivo inválido.", "error")
+            return redirect(url_for("import.nova"))
+
         pref = read_table(prefeitura_path, request.form.get("prefeitura_sheet") or None, request.form.get("prefeitura_header_row"))
         ipa = read_table(ipasgo_path, request.form.get("ipasgo_sheet") or None, request.form.get("ipasgo_header_row"))
 
@@ -75,16 +90,25 @@ def executar():
             "status": "Concluída",
         }
         comparison_id = create_comparison(current_app.config["DB_PATH"], db_summary, rows)
+
         report_base = current_app.config["REPORT_DIR"] / f"comparacao_{comparison_id:05d}"
         excel_path = report_base.with_suffix(".xlsx")
         pdf_path = report_base.with_suffix(".pdf")
-        generate_excel_report(excel_path, summary_report, rows, pref_rows, ipa_rows, pref_invalid, ipa_invalid)
-        generate_pdf_report(pdf_path, summary_report, rows)
-        update_report_paths(current_app.config["DB_PATH"], comparison_id, excel_path, pdf_path)
+        try:
+            generate_excel_report(excel_path, summary_report, rows, pref_rows, ipa_rows, pref_invalid, ipa_invalid)
+            generate_pdf_report(pdf_path, summary_report, rows)
+            update_report_paths(current_app.config["DB_PATH"], comparison_id, excel_path, pdf_path)
+        except Exception:
+            logger.exception("Falha ao gerar relatórios para comparação %s", comparison_id)
+            delete_comparison(current_app.config["DB_PATH"], comparison_id)
+            flash("Erro ao gerar os relatórios. Comparação cancelada.", "error")
+            return redirect(url_for("import.nova"))
+
         flash("Comparação concluída com sucesso.", "success")
         return redirect(url_for("comparison.detalhe", comparison_id=comparison_id))
-    except Exception as exc:
-        flash(f"Erro durante a comparação: {exc}", "error")
+    except Exception:
+        logger.exception("Erro durante a comparação")
+        flash("Erro inesperado durante a comparação. Tente novamente.", "error")
         return redirect(url_for("import.nova"))
 
 

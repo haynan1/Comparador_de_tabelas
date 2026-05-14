@@ -1,7 +1,11 @@
+import logging
+
 from flask import Blueprint, current_app, flash, redirect, render_template, url_for
 
 from app.models.comparison_model import clear_comparison_history, list_comparisons
 
+
+logger = logging.getLogger(__name__)
 
 main_bp = Blueprint("main", __name__)
 
@@ -40,6 +44,10 @@ def comparador():
 
 @main_bp.route("/comparacoes/limpar-historico", methods=["POST"])
 def limpar_historico():
-    clear_comparison_history(current_app.config["DB_PATH"])
-    flash("Histórico de comparações limpo com sucesso.", "success")
+    try:
+        clear_comparison_history(current_app.config["DB_PATH"])
+        flash("Histórico de comparações limpo com sucesso.", "success")
+    except Exception:
+        logger.exception("Erro ao limpar histórico")
+        flash("Erro ao limpar histórico. Tente novamente.", "error")
     return redirect(url_for("main.comparador"))
