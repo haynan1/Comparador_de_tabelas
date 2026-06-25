@@ -4,39 +4,29 @@
 <main class="link-hub-shell">
   <section class="link-hub-profile" aria-labelledby="link-hub-title">
     <img class="link-hub-avatar" src="{{ url_for('static', filename='img/imagem.png') }}" alt="Perfil de Recursos Humanos">
-    <p class="link-hub-eyebrow">Link Hub</p>
+    <p class="link-hub-eyebrow">Acesso ao sistema</p>
     <h1 id="link-hub-title">Recursos Humanos</h1>
-    <p class="link-hub-subtitle">IPASGO | Relatórios | Validações | Ferramentas administrativas</p>
+    <p class="link-hub-subtitle">IPASGO | Relatórios | Validações</p>
   </section>
 
-  <nav class="link-hub-list" aria-label="Links principais">
-    {% for utility in utilities %}
-      {% if utility.href == "#" %}
-        <article class="link-hub-button disabled" aria-disabled="true">
-          <span class="link-hub-icon" aria-hidden="true">{{ utility.icon }}</span>
-          <span class="link-hub-content">
-            <span class="link-hub-title-row">
-              <span class="link-hub-title">{{ utility.title }}</span>
-              <span class="link-hub-status">{{ utility.status }}</span>
-            </span>
-            <span class="link-hub-description">{{ utility.description }}</span>
-          </span>
-          <span class="link-hub-arrow" aria-hidden="true">&rsaquo;</span>
-        </article>
-      {% else %}
-        <a class="link-hub-button" href="{{ utility.href }}">
-          <span class="link-hub-icon" aria-hidden="true">{{ utility.icon }}</span>
-          <span class="link-hub-content">
-            <span class="link-hub-title-row">
-              <span class="link-hub-title">{{ utility.title }}</span>
-              <span class="link-hub-status">{{ utility.status }}</span>
-            </span>
-            <span class="link-hub-description">{{ utility.description }}</span>
-          </span>
-          <span class="link-hub-arrow" aria-hidden="true">&rsaquo;</span>
-        </a>
-      {% endif %}
-    {% endfor %}
+  <nav class="link-hub-list" aria-label="Entrada do sistema">
+    <a class="link-hub-button rh-entry-button" href="{{ rh_button.href }}">
+      <span class="link-hub-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" role="img" focusable="false">
+          <path d="M16 21v-2a4 4 0 0 0-4-4H7a4 4 0 0 0-4 4v2"/>
+          <circle cx="9.5" cy="7" r="4"/>
+          <path d="M22 21v-2a4 4 0 0 0-3-3.87"/>
+          <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+        </svg>
+      </span>
+      <span class="link-hub-content">
+        <span class="link-hub-title-row">
+          <span class="link-hub-title">{{ rh_button.title }}</span>
+        </span>
+        <span class="link-hub-description">{{ rh_button.description }}</span>
+      </span>
+      <span class="link-hub-arrow" aria-hidden="true">&rsaquo;</span>
+    </a>
   </nav>
 </main>
 {% endblock %}

@@ -2,12 +2,34 @@
 
 Aplicação Flask para Recursos Humanos comparar relatórios da Prefeitura e do IPASGO por CPF, com valores tratados por `Decimal`, histórico em SQLite e relatórios em Excel/PDF.
 
-## Como executar localmente
+## Como executar no Windows
+
+A forma mais simples é usar o arquivo:
+
+```text
+iniciar_sistema.bat
+```
+
+Ele faz automaticamente:
+
+1. Cria a pasta `venv`, caso ela ainda não exista.
+2. Instala ou atualiza as dependências do `requirements.txt`.
+3. Inicia o sistema na porta padrão `5000`.
+
+Depois de executar o `.bat`, abra:
+
+```text
+http://127.0.0.1:5000
+```
+
+Use apenas a porta `5000` para evitar divergência de versão entre instâncias antigas abertas em outras portas.
+
+## Como executar manualmente
 
 ```powershell
 cd comparador_ipasgo_app
-python -m venv .venv
-.\.venv\Scripts\Activate.ps1
+python -m venv venv
+.\venv\Scripts\Activate.ps1
 pip install -r requirements.txt
 python run.py
 ```
@@ -21,7 +43,7 @@ http://127.0.0.1:5000
 ## Fluxo de uso
 
 1. Entre em **Recursos Humanos**.
-2. Abra **Comparador de Descontos IPASGO**.
+2. Clique no botão **RH**.
 3. Clique em **Nova Comparação**.
 4. Envie o arquivo da Prefeitura e o arquivo oficial do IPASGO.
 5. Confira a prévia e ajuste aba, cabeçalho e colunas quando necessário.
@@ -34,6 +56,18 @@ http://127.0.0.1:5000
 - `.csv`
 - `.xlsx`
 - `.xls`
+
+## Banco de dados
+
+O sistema usa **SQLite**.
+
+Por padrão, o banco fica em:
+
+```text
+data/comparador_ipasgo.sqlite3
+```
+
+Ele guarda o histórico das comparações e os resultados relacionados.
 
 ## Dados locais
 
@@ -64,6 +98,12 @@ Veja [.env.example](.env.example).
 
 ```powershell
 pytest
+```
+
+Ou usando diretamente a `venv`:
+
+```powershell
+.\venv\Scripts\python.exe -m pytest
 ```
 
 ## Deploy em VM

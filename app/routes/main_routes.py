@@ -12,23 +12,12 @@ main_bp = Blueprint("main", __name__)
 
 @main_bp.route("/")
 def dashboard():
-    utilities = [
-        {
-            "title": "Comparador de Descontos IPASGO",
-            "description": "Importe relatórios, compare por CPF e gere Excel/PDF.",
-            "href": "/comparacoes",
-            "status": "Disponível",
-            "icon": "IP",
-        },
-        {
-            "title": "Nova utilidade",
-            "description": "Espaço reservado para outro processo administrativo local.",
-            "href": "#",
-            "status": "Em breve",
-            "icon": "+",
-        },
-    ]
-    return render_template("linktree.html", utilities=utilities)
+    rh_button = {
+        "title": "RH",
+        "description": "Entrar no sistema de comparação de descontos IPASGO.",
+        "href": "/comparacoes",
+    }
+    return render_template("linktree.html", rh_button=rh_button)
 
 
 @main_bp.route("/healthz")

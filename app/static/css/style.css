@@ -344,6 +344,15 @@ body.linktree-page .page {
   background: color-mix(in srgb, var(--hub-accent) 12%, transparent);
   border-radius: 8px;
 }
+.link-hub-icon svg {
+  width: 21px;
+  height: 21px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
 .link-hub-content { min-width: 0; padding: 0 12px; }
 .link-hub-title-row {
   display: flex;
