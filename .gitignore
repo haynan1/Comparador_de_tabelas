@@ -12,3 +12,4 @@ data/processed/*
 !data/reports/.gitkeep
 !data/processed/.gitkeep
 *.log
+temp/
